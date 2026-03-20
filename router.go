@@ -21,12 +21,19 @@ func NewRouterHandle() *RouterHandle {
 	r.Routes["/"] = r.HandleMain
 	r.Routes["/time"] = r.HandleTime
 	r.Routes["/date"] = r.HandleDate
+	r.Routes["/crashtest"] = r.HandleCrashTest
 	return r
 }
 
 // ServeHTTP dispatches incoming requests to the appropriate handler
 // based on the request path. If no handler is found, it returns 404 Not Found.
 func (r *RouterHandle) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	defer func() {
+		if err := recover(); err !=nil {
+			log.Printf("Critical error: %v", err)
+			http.Error(w, "Something broke on the server.", 500)
+		}
+	}()
 	if handler, ok := r.Routes[req.URL.Path]; ok {
 		handler(w, req)
 	} else {
@@ -54,4 +61,12 @@ func (r *RouterHandle) HandleTime(res http.ResponseWriter, req *http.Request) {
 func (r *RouterHandle) HandleDate(res http.ResponseWriter, req *http.Request) {
 	s := time.Now().Format("02.01.06")
 	res.Write([]byte(s))
+}
+
+// HandleCrashTest intentionally triggers a runtime panic
+// by accessing an out-of-range index in a slice.
+// Useful for testing router crash recovery and error handling.
+func (r *RouterHandle) HandleCrashTest(res http.ResponseWriter, req *http.Request) {
+	var list []int
+	fmt.Println(list[99]) // exit to area list
 }
