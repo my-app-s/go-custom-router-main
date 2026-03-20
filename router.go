@@ -4,6 +4,7 @@ package router
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 )
@@ -29,7 +30,7 @@ func NewRouterHandle() *RouterHandle {
 // based on the request path. If no handler is found, it returns 404 Not Found.
 func (r *RouterHandle) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	defer func() {
-		if err := recover(); err !=nil {
+		if err := recover(); err != nil {
 			log.Printf("Critical error: %v", err)
 			http.Error(w, "Something broke on the server.", 500)
 		}
