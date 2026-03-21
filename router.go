@@ -1,5 +1,9 @@
+// Copyright (C) 2025-2026 my-app-s
+// Licensed under the GNU AGPLv3
+
 // Package router provides a simple custom HTTP router
 // for handling requests in Go applications.
+
 package router
 
 import (
